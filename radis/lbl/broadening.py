@@ -2064,73 +2064,72 @@ class BroadenFactory(BaseFactory):
                         mi0_sel = mi0 == m
                         mi1_sel = mi1 == m
 
+                        # 0,0
                         bool_sel = li0_sel & mi0_sel
+                        S_sel = S[bool_sel]
+                        avi_sel = avi[bool_sel]
+                        aGi_sel = aGi[bool_sel]
+                        aLi_sel = aLi[bool_sel]
                         np.add.at(
                             I_temp,
                             ki0[bool_sel],
-                            S[bool_sel]
-                            * (1 - avi[bool_sel])
-                            * (1 - aGi[bool_sel])
-                            * (1 - aLi[bool_sel]),
+                            S_sel * (1 - avi_sel) * (1 - aGi_sel) * (1 - aLi_sel),
                         )
                         np.add.at(
                             I_temp,
                             ki1[bool_sel],
-                            S[bool_sel]
-                            * avi[bool_sel]
-                            * (1 - aGi[bool_sel])
-                            * (1 - aLi[bool_sel]),
+                            S_sel * avi_sel * (1 - aGi_sel) * (1 - aLi_sel),
                         )
 
+                        # 0,1
                         bool_sel = li0_sel & mi1_sel
+                        S_sel = S[bool_sel]
+                        avi_sel = avi[bool_sel]
+                        aGi_sel = aGi[bool_sel]
+                        aLi_sel = aLi[bool_sel]
                         np.add.at(
                             I_temp,
                             ki0[bool_sel],
-                            S[bool_sel]
-                            * (1 - avi[bool_sel])
-                            * (1 - aGi[bool_sel])
-                            * aLi[bool_sel],
+                            S_sel * (1 - avi_sel) * (1 - aGi_sel) * aLi_sel,
                         )
                         np.add.at(
                             I_temp,
                             ki1[bool_sel],
-                            S[bool_sel]
-                            * avi[bool_sel]
-                            * (1 - aGi[bool_sel])
-                            * aLi[bool_sel],
+                            S_sel * avi_sel * (1 - aLi_sel) * aLi_sel,
                         )
 
+                        # 1,0
                         bool_sel = li1_sel & mi0_sel
+                        S_sel = S[bool_sel]
+                        avi_sel = avi[bool_sel]
+                        aGi_sel = aGi[bool_sel]
+                        aLi_sel = aLi[bool_sel]
                         np.add.at(
                             I_temp,
                             ki0[bool_sel],
-                            S[bool_sel]
-                            * (1 - avi[bool_sel])
-                            * aGi[bool_sel]
-                            * (1 - aLi[bool_sel]),
+                            S_sel * (1 - avi_sel) * aGi_sel * (1 - aLi_sel),
                         )
                         np.add.at(
                             I_temp,
                             ki1[bool_sel],
-                            S[bool_sel]
-                            * avi[bool_sel]
-                            * aGi[bool_sel]
-                            * (1 - aLi[bool_sel]),
+                            S_sel * avi_sel * aGi_sel * (1 - aLi_sel),
                         )
 
+                        # 1,1
                         bool_sel = li1_sel & mi1_sel
+                        S_sel = S[bool_sel]
+                        avi_sel = avi[bool_sel]
+                        aGi_sel = aGi[bool_sel]
+                        aLi_sel = aLi[bool_sel]
                         np.add.at(
                             I_temp,
                             ki0[bool_sel],
-                            S[bool_sel]
-                            * (1 - avi[bool_sel])
-                            * aGi[bool_sel]
-                            * aLi[bool_sel],
+                            S_sel * (1 - avi_sel) * aGi_sel * aLi_sel,
                         )
                         np.add.at(
                             I_temp,
                             ki1[bool_sel],
-                            S[bool_sel] * avi[bool_sel] * aGi[bool_sel] * aLi[bool_sel],
+                            S_sel * avi_sel * aGi_sel * aLi_sel,
                         )
 
                         mask = non_zero_values_around(I_temp, truncation_pts)
