@@ -73,14 +73,7 @@ from scipy.signal import oaconvolve
 import radis
 from radis.db.references import doi
 from radis.lbl.base import BaseFactory
-from radis.misc.arrays import (
-    add_at,
-    arange_len,
-    boolean_array_from_coordinates,
-    non_zero_ranges_in_array,
-    numpy_add_at,
-    sparse_add_at,
-)
+from radis.misc.arrays import add_at, arange_len, non_zero_values_around, numpy_add_at
 from radis.misc.basics import is_float
 from radis.misc.debug import printdbg
 from radis.misc.plot import fix_style, set_style
@@ -1913,123 +1906,123 @@ class BroadenFactory(BaseFactory):
             broadening_method in ["voigt", "convolve"]
             and radis.config["SPARSE_WAVERANGE"]
         ):
+            0
+            # import pandas as pd
 
-            import pandas as pd
+            # df = pd.DataFrame(
+            #     {
+            #         "ki0": ki0,
+            #         "li0": li0,
+            #         "li1": li1,
+            #         "mi0": mi0,
+            #         "mi1": mi1,
+            #         "Iv0": Iv0,
+            #         "Iv1": Iv1,
+            #         "awV00": awV00,
+            #         "awV01": awV01,
+            #         "awV10": awV10,
+            #         "awV11": awV11,
+            #     },
+            #     copy=False,
+            # )
 
-            df = pd.DataFrame(
-                {
-                    "ki0": ki0,
-                    "li0": li0,
-                    "li1": li1,
-                    "mi0": mi0,
-                    "mi1": mi1,
-                    "Iv0": Iv0,
-                    "Iv1": Iv1,
-                    "awV00": awV00,
-                    "awV01": awV01,
-                    "awV10": awV10,
-                    "awV11": awV11,
-                },
-                copy=False,
-            )
+            # def get_non_zero_wranges(groupby_parameters, max_range, intensity_weight):
+            #     """Get coordinates of non-zero wave ranges for all lines
+            #     that share the same ``groupby_parameters``
 
-            def get_non_zero_wranges(groupby_parameters, max_range, intensity_weight):
-                """Get coordinates of non-zero wave ranges for all lines
-                that share the same ``groupby_parameters``
+            #     Parameters
+            #     ----------
+            #     groupby_parameters: str
+            #     max_range: int
 
-                Parameters
-                ----------
-                groupby_parameters: str
-                max_range: int
+            #     Examples
+            #     --------
+            #     ::
+            #         DLM_ranges_00 = get_non_zero_wranges(groupby_parameters=["li0", "mi0"], max_range=len(wavenumber_calc))
+            #     """
+            #     # EP 31/10: the for loop over df.groupby is the current bottleneck
+            #     # (not even the sparse_add_at function !)
+            #     dgb = df.groupby(groupby_parameters, sort=False)
+            #     DLM_ranges = {}
+            #     DLM_reduced = {}
+            #     for groupby_param, group in dgb:
+            #         truncation_pts = int(self.params.truncation // self.params.wstep)
+            #         # note: truncation can be unique for each point of the DLM basis
+            #         # (allow to have line-dependant truncatino, at least as all
+            #         # lines with same truncation are grouped together in the DLM basis)
 
-                Examples
-                --------
-                ::
-                    DLM_ranges_00 = get_non_zero_wranges(groupby_parameters=["li0", "mi0"], max_range=len(wavenumber_calc))
-                """
-                # EP 31/10: the for loop over df.groupby is the current bottleneck
-                # (not even the sparse_add_at function !)
-                dgb = df.groupby(groupby_parameters, sort=False)
-                DLM_ranges = {}
-                DLM_reduced = {}
-                for groupby_param, group in dgb:
-                    truncation_pts = int(self.params.truncation // self.params.wstep)
-                    # note: truncation can be unique for each point of the DLM basis
-                    # (allow to have line-dependant truncatino, at least as all
-                    # lines with same truncation are grouped together in the DLM basis)
+            #         ki0 = group.ki0.values
+            #         Iv0 = group.Iv0.values
+            #         Iv1 = group.Iv1.values
+            #         weight = group[intensity_weight].values
 
-                    ki0 = group.ki0.values
-                    Iv0 = group.Iv0.values
-                    Iv1 = group.Iv1.values
-                    weight = group[intensity_weight].values
+            #         # build the list of non-empty ranges for all lines with this lineshape :
+            #         start, stop, I = sparse_add_at(
+            #             ki0, Iv0, Iv1, weight, max_range, truncation_pts
+            #         )
 
-                    # build the list of non-empty ranges for all lines with this lineshape :
-                    start, stop, I = sparse_add_at(
-                        ki0, Iv0, Iv1, weight, max_range, truncation_pts
-                    )
+            #         DLM_ranges[groupby_param] = start, stop
 
-                    DLM_ranges[groupby_param] = start, stop
+            #         # generate reduced array:
+            #         b = boolean_array_from_coordinates(start, stop, len(I))
+            #         I_reduced = I[b]
+            #         DLM_reduced[groupby_param] = I_reduced
 
-                    # generate reduced array:
-                    b = boolean_array_from_coordinates(start, stop, len(I))
-                    I_reduced = I[b]
-                    DLM_reduced[groupby_param] = I_reduced
+            #     return DLM_ranges, DLM_reduced
 
-                return DLM_ranges, DLM_reduced
+            # w = wavenumber_calc
 
-            w = wavenumber_calc
+            # DLM_ranges_00, DLM_reduced_00 = get_non_zero_wranges(
+            #     groupby_parameters=["li0", "mi0"],
+            #     max_range=len(w),
+            #     intensity_weight="awV00",
+            # )
+            # DLM_ranges_01, DLM_reduced_01 = get_non_zero_wranges(
+            #     groupby_parameters=["li0", "mi1"],
+            #     max_range=len(w),
+            #     intensity_weight="awV01",
+            # )
+            # DLM_ranges_10, DLM_reduced_10 = get_non_zero_wranges(
+            #     groupby_parameters=["li1", "mi0"],
+            #     max_range=len(w),
+            #     intensity_weight="awV10",
+            # )
+            # DLM_ranges_11, DLM_reduced_11 = get_non_zero_wranges(
+            #     groupby_parameters=["li1", "mi1"],
+            #     max_range=len(w),
+            #     intensity_weight="awV11",
+            # )
 
-            DLM_ranges_00, DLM_reduced_00 = get_non_zero_wranges(
-                groupby_parameters=["li0", "mi0"],
-                max_range=len(w),
-                intensity_weight="awV00",
-            )
-            DLM_ranges_01, DLM_reduced_01 = get_non_zero_wranges(
-                groupby_parameters=["li0", "mi1"],
-                max_range=len(w),
-                intensity_weight="awV01",
-            )
-            DLM_ranges_10, DLM_reduced_10 = get_non_zero_wranges(
-                groupby_parameters=["li1", "mi0"],
-                max_range=len(w),
-                intensity_weight="awV10",
-            )
-            DLM_ranges_11, DLM_reduced_11 = get_non_zero_wranges(
-                groupby_parameters=["li1", "mi1"],
-                max_range=len(w),
-                intensity_weight="awV11",
-            )
-
-            # Combine all DLM ranges:
-            DLM_ranges = dict().fromkeys(
-                set(DLM_ranges_00.keys())
-                | set(DLM_ranges_01.keys())
-                | set(DLM_ranges_10.keys())
-                | set(DLM_ranges_11.keys())
-            )
-            DLM_reduced = dict().fromkeys(DLM_ranges.keys())
-            for param in DLM_ranges.keys():
-                b = np.zeros(len(w), dtype=bool)
-                I = np.zeros(len(w))
-                if param in DLM_ranges_00:
-                    bi = boolean_array_from_coordinates(*DLM_ranges_00[param], len(w))
-                    I[bi] += DLM_reduced_00[param]
-                    b += bi
-                if param in DLM_ranges_01:
-                    bi = boolean_array_from_coordinates(*DLM_ranges_01[param], len(w))
-                    I[bi] += DLM_reduced_01[param]
-                    b += bi
-                if param in DLM_ranges_10:
-                    bi = boolean_array_from_coordinates(*DLM_ranges_10[param], len(w))
-                    I[bi] += DLM_reduced_10[param]
-                    b += bi
-                if param in DLM_ranges_11:
-                    bi = boolean_array_from_coordinates(*DLM_ranges_11[param], len(w))
-                    I[bi] += DLM_reduced_11[param]
-                    b += bi
-                # Sparse storage (coordinates & non-zeros ranges) :
-                DLM_ranges[param] = non_zero_ranges_in_array(b)
-                DLM_reduced[param] = I[b]
+            # # Combine all DLM ranges:
+            # DLM_ranges = dict().fromkeys(
+            #     set(DLM_ranges_00.keys())
+            #     | set(DLM_ranges_01.keys())
+            #     | set(DLM_ranges_10.keys())
+            #     | set(DLM_ranges_11.keys())
+            # )
+            # DLM_reduced = dict().fromkeys(DLM_ranges.keys())
+            # for param in DLM_ranges.keys():
+            #     b = np.zeros(len(w), dtype=bool)
+            #     I = np.zeros(len(w))
+            #     if param in DLM_ranges_00:
+            #         bi = boolean_array_from_coordinates(*DLM_ranges_00[param], len(w))
+            #         I[bi] += DLM_reduced_00[param]
+            #         b += bi
+            #     if param in DLM_ranges_01:
+            #         bi = boolean_array_from_coordinates(*DLM_ranges_01[param], len(w))
+            #         I[bi] += DLM_reduced_01[param]
+            #         b += bi
+            #     if param in DLM_ranges_10:
+            #         bi = boolean_array_from_coordinates(*DLM_ranges_10[param], len(w))
+            #         I[bi] += DLM_reduced_10[param]
+            #         b += bi
+            #     if param in DLM_ranges_11:
+            #         bi = boolean_array_from_coordinates(*DLM_ranges_11[param], len(w))
+            #         I[bi] += DLM_reduced_11[param]
+            #         b += bi
+            #     # Sparse storage (coordinates & non-zeros ranges) :
+            #     DLM_ranges[param] = non_zero_ranges_in_array(b)
+            #     DLM_reduced[param] = I[b]
 
         else:
             _add_at(DLM, ki0, li0, mi0, Iv0 * awV00)
@@ -2057,19 +2050,94 @@ class BroadenFactory(BaseFactory):
 
             # ... Initialize array on which to distribute the lineshapes
             sumoflines_calc = zeros_like(wavenumber_calc)
-
+            truncation_pts = int(self.params.truncation // self.params.wstep)
             for l in range(len(wG)):
                 for m in range(len(wL)):
                     lineshape = line_profile_DLM[l][m]
 
                     if radis.config["SPARSE_WAVERANGE"]:
-                        if (l, m) in DLM_ranges.keys():
-                            mask = boolean_array_from_coordinates(
-                                *DLM_ranges[(l, m)], len(sumoflines_calc)
-                            )
-                            sumoflines_calc[mask] += oaconvolve(
-                                DLM_reduced[(l, m)], lineshape, "same"
-                            )
+
+                        I_temp = zeros_like(wavenumber_calc)
+
+                        li0_sel = li0 == l
+                        li1_sel = li1 == l
+                        mi0_sel = mi0 == m
+                        mi1_sel = mi1 == m
+
+                        bool_sel = li0_sel & mi0_sel
+                        np.add.at(
+                            I_temp,
+                            ki0[bool_sel],
+                            S[bool_sel]
+                            * (1 - avi[bool_sel])
+                            * (1 - aGi[bool_sel])
+                            * (1 - aLi[bool_sel]),
+                        )
+                        np.add.at(
+                            I_temp,
+                            ki1[bool_sel],
+                            S[bool_sel]
+                            * avi[bool_sel]
+                            * (1 - aGi[bool_sel])
+                            * (1 - aLi[bool_sel]),
+                        )
+
+                        bool_sel = li0_sel & mi1_sel
+                        np.add.at(
+                            I_temp,
+                            ki0[bool_sel],
+                            S[bool_sel]
+                            * (1 - avi[bool_sel])
+                            * (1 - aGi[bool_sel])
+                            * aLi[bool_sel],
+                        )
+                        np.add.at(
+                            I_temp,
+                            ki1[bool_sel],
+                            S[bool_sel]
+                            * avi[bool_sel]
+                            * (1 - aGi[bool_sel])
+                            * aLi[bool_sel],
+                        )
+
+                        bool_sel = li1_sel & mi0_sel
+                        np.add.at(
+                            I_temp,
+                            ki0[bool_sel],
+                            S[bool_sel]
+                            * (1 - avi[bool_sel])
+                            * aGi[bool_sel]
+                            * (1 - aLi[bool_sel]),
+                        )
+                        np.add.at(
+                            I_temp,
+                            ki1[bool_sel],
+                            S[bool_sel]
+                            * avi[bool_sel]
+                            * aGi[bool_sel]
+                            * (1 - aLi[bool_sel]),
+                        )
+
+                        bool_sel = li1_sel & mi1_sel
+                        np.add.at(
+                            I_temp,
+                            ki0[bool_sel],
+                            S[bool_sel]
+                            * (1 - avi[bool_sel])
+                            * aGi[bool_sel]
+                            * aLi[bool_sel],
+                        )
+                        np.add.at(
+                            I_temp,
+                            ki1[bool_sel],
+                            S[bool_sel] * avi[bool_sel] * aGi[bool_sel] * aLi[bool_sel],
+                        )
+
+                        mask = non_zero_values_around(I_temp, truncation_pts)
+
+                        sumoflines_calc[mask] += oaconvolve(
+                            I_temp[mask], lineshape, "same"
+                        )
                     else:
                         sumoflines_calc += oaconvolve(DLM[:, l, m], lineshape, "same")
 
