@@ -222,6 +222,8 @@ class DatabaseManager(object):
 
         if engine == "vaex":
             local_files = [fname.replace(".h5", ".hdf5") for fname in local_files]
+        elif engine == "pytables":
+            local_files = [fname.replace(".hdf5", ".h5") for fname in local_files]
 
         return local_files, urlnames
 

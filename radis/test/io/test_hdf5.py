@@ -66,7 +66,7 @@ def test_hdf5_io_engines(*args, **kwargs):
 
 
 @pytest.mark.needs_connection
-def test_local_hdf5_lines_loading(*args, **kwargs):
+def test_local_hdf5_lines_loading_pytables(*args, **kwargs):
     """
     We use the OH HITEMP line database to test :py:func:`~radis.io.hitemp.fetch_hitemp`
     and :py:func:`~radis.io.hdf5.hdf2df`
@@ -77,14 +77,24 @@ def test_local_hdf5_lines_loading(*args, **kwargs):
 
     """
 
-    fetch_hitemp("OH")  # to initialize the database
+    from os.path import join
 
-    path = getDatabankEntries("HITEMP-OH")["path"]
+    from radis.test.utils import getTestFile
+
+    database_params = {
+        "local_databases": join(getTestFile("."), "hitemp"),
+        "databank_name": "HITEMP-OH-TEST-ENGINE-PYTABLES",
+        "engine": "pytables",
+    }
+    database_register_name = database_params["databank_name"]
+
+    path = getDatabankEntries(database_register_name)["path"]
 
     # Initialize the database
-    fetch_hitemp("OH")
-    path = getDatabankEntries("HITEMP-OH")["path"][0]
-    df = hdf2df(path)
+    fetch_hitemp("OH", **database_params)  # to initialize the database
+
+    path = getDatabankEntries(database_register_name)["path"][0]
+    df = hdf2df(path, engine="guess")
     wmin, wmax = df.wav.min(), df.wav.max()
     assert wmin < 2300  # needed for next test to be valid
     assert wmax > 2500  # needed for next test to be valid
@@ -92,25 +102,82 @@ def test_local_hdf5_lines_loading(*args, **kwargs):
     assert len(df.iso.unique()) > 1
 
     # Test loading only certain columns
-    df = hdf2df(path, columns=["wav", "int"])
+    df = hdf2df(path, engine="guess", columns=["wav", "int"])
     assert len(df.columns) == 2 and "wav" in df.columns and "int" in df.columns
 
     # Test loading only certain isotopes
-    df = hdf2df(path, isotope="2")
+    df = hdf2df(path, engine="guess", isotope="2")
     assert df.iso.unique() == 2
 
     # Test partial loading of wavenumbers
-    df = hdf2df(path, load_wavenum_min=2300, load_wavenum_max=2500)
+    df = hdf2df(path, engine="guess", load_wavenum_min=2300, load_wavenum_max=2500)
     assert df.wav.min() >= 2300
     assert df.wav.max() <= 2500
 
     # Test with only one
-    assert hdf2df(path, load_wavenum_min=2300).wav.min() >= 2300
+    assert hdf2df(path, engine="guess", load_wavenum_min=2300).wav.min() >= 2300
 
     # Test with the other
-    assert hdf2df(path, load_wavenum_max=2500).wav.max() <= 2500
+    assert hdf2df(path, engine="guess", load_wavenum_max=2500).wav.max() <= 2500
+
+
+@pytest.mark.needs_connection
+def test_local_hdf5_lines_loading_vaex(*args, **kwargs):
+    """
+    We use the OH HITEMP line database to test :py:func:`~radis.io.hitemp.fetch_hitemp`
+    and :py:func:`~radis.io.hdf5.hdf2df`
+
+    - Partial loading (only specific wavenumbers)
+    - Only certain isotopes
+    - Only certain columns
+
+    """
+
+    from os.path import join
+
+    from radis.test.utils import getTestFile
+
+    database_params = {
+        "local_databases": join(getTestFile("."), "hitemp"),
+        "databank_name": "HITEMP-OH-TEST-ENGINE-VAEX",
+        "engine": "vaex",
+    }
+    database_register_name = database_params["databank_name"]
+
+    path = getDatabankEntries(database_register_name)["path"]
+
+    # Initialize the database
+    fetch_hitemp("OH", **database_params)  # to initialize the database
+
+    path = getDatabankEntries(database_register_name)["path"][0]
+    df = hdf2df(path, engine="guess")
+    wmin, wmax = df.wav.min(), df.wav.max()
+    assert wmin < 2300  # needed for next test to be valid
+    assert wmax > 2500  # needed for next test to be valid
+    assert len(df.columns) > 5  # many columns loaded by default
+    assert len(df.iso.unique()) > 1
+
+    # Test loading only certain columns
+    df = hdf2df(path, engine="guess", columns=["wav", "int"])
+    assert len(df.columns) == 2 and "wav" in df.columns and "int" in df.columns
+
+    # Test loading only certain isotopes
+    df = hdf2df(path, engine="guess", isotope="2")
+    assert df.iso.unique() == 2
+
+    # Test partial loading of wavenumbers
+    df = hdf2df(path, engine="guess", load_wavenum_min=2300, load_wavenum_max=2500)
+    assert df.wav.min() >= 2300
+    assert df.wav.max() <= 2500
+
+    # Test with only one
+    assert hdf2df(path, engine="guess", load_wavenum_min=2300).wav.min() >= 2300
+
+    # Test with the other
+    assert hdf2df(path, engine="guess", load_wavenum_max=2500).wav.max() <= 2500
 
 
 if __name__ == "__main__":
     test_hdf5_io_engines()
-    test_local_hdf5_lines_loading()
+    test_local_hdf5_lines_loading_pytables()
+    test_local_hdf5_lines_loading_vaex()
