@@ -38,6 +38,8 @@ a condition was added afterwards to the Spectrum class)::
 You can see more examples on the :ref:`Spectrum Database section <label_spectrum_database>`
 of the website.
 
+.. minigallery:: radis.tools.database.SpecDatabase
+
 -------------------------------------------------------------------------------
 """
 
@@ -1036,6 +1038,9 @@ class SpecList(object):
 
                 db.see(['Tvib', 'Trot'])
 
+
+        .. minigallery:: radis.tools.database.SpecList.see
+
         Notes
         -----
 
@@ -1113,6 +1118,7 @@ class SpecList(object):
             # Export to a new database:
             db.compress_to(db.path+'_interp')
 
+        .. minigallery:: radis.tools.database.SpecList.map
         """
         for s in self:
             function(s)
@@ -1582,6 +1588,9 @@ class SpecList(object):
         ::
 
             db.create_fname_grid(["Tgas", "pressure_mbar"])
+
+
+        .. minigallery:: radis.tools.database.SpecList.plot_cond
 
         See Also
         --------

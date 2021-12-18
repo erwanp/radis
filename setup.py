@@ -247,10 +247,9 @@ def run_setup(with_binary):
             "beautifulsoup4",  # parse ExoMol website
             "configparser",
             "cython",
+            "exo_k",  # c-k models
             "hitran-api",
             "lxml",  # parser used for ExoMol website
-            "numpy",
-            "matplotlib",  # ">=3.4.0" to suppress the Ruler warning, but only available for Python >= 3.7
             "habanero",  # CrossRef API to retrieve data from doi
             "h5py",  # HDF5
             "hjson",
@@ -260,7 +259,9 @@ def run_setup(with_binary):
             "plotly>=2.5.1",
             "progressbar2",  # used in vaex
             "numba",
+            "matplotlib",  # ">=3.4.0" to suppress the Ruler warning, but only available for Python >= 3.7
             "mpldatacursor",
+            "numpy",
             "publib>=0.3.2",  # Plotting styles for Matplotlib
             "plotly>=2.5.1",  # for line survey HTML output
             "peakutils",

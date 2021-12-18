@@ -29,6 +29,7 @@ dependencies:
 - pip
 - pip:
   - beautifulsoup4 # parse ExoMol website
+  - exo_k          # c-k models http://perso.astrophy.u-bordeaux.fr/~jleconte/exo_k-doc/index.html
   - lxml           # parser used for ExoMol website
   - hjson          # Json with comments (for default_radis.json)
   - publib>=0.3.2  # Plotting styles for Matplotlib
