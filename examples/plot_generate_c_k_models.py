@@ -21,7 +21,7 @@ sf = SpectrumFactory(
     wavenum_min=2900,
     wavenum_max=3200,
     molecule="OH",
-    truncation=5,  # cm-1
+    truncation=60,  # cm-1
     verbose=0,  # more for more details
     wstep="auto",
     # wstep=0.003,
@@ -141,10 +141,10 @@ s = sf.eq_spectrum(Tgas=1300, pressure=1)
 
 """
 %timeit ktab.spectrum_to_plot(t=1300, p=1, g=1)
-57.9 ms ± 2.27 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
+55.6 ms ± 1.29 ms per loop (mean ± std. dev. of 7 runs, 10 loops each)
 
 %timeit sf.eq_spectrum(Tgas=1300, pressure=1)
-23.2 ms ± 931 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
+22.2 ms ± 666 µs per loop (mean ± std. dev. of 7 runs, 10 loops each)
 """
 
 plt.figure(figsize=(16, 6))
